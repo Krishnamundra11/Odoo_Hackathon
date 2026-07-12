@@ -10,9 +10,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
-const authRoutes = require('./features/auth/auth.routes');
+const authRoutes  = require('./features/auth/auth.routes');
+const assetRoutes = require('./features/assets/asset.routes');
 
-app.use('/api/auth', authRoutes);
+app.use('/api/auth',   authRoutes);
+app.use('/api/assets', assetRoutes);
 
 app.get('/api/health', (req, res) => {
   res.status(200).json({ success: true, message: 'AssetFlow API is running' });

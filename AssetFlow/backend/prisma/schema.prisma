@@ -53,6 +53,7 @@ model AssetCategory {
 
 model Asset {
   id              String         @id @default(uuid())
+  assetTag        String         @unique   // Auto-generated: AF-0001, AF-0002 …
   name            String
   serialNumber    String         @unique
   status          AssetStatus    @default(AVAILABLE)
