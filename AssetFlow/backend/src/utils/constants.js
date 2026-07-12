@@ -17,11 +17,13 @@ const USER_STATUS = Object.freeze({
 });
 
 const ASSET_STATUS = Object.freeze({
-  AVAILABLE:      'available',
-  ALLOCATED:      'allocated',
-  IN_MAINTENANCE: 'in_maintenance',
-  RETIRED:        'retired',
-  MISSING:        'missing',
+  AVAILABLE:         'available',
+  ALLOCATED:         'allocated',
+  RESERVED:          'reserved',
+  UNDER_MAINTENANCE: 'under_maintenance',
+  LOST:              'lost',
+  RETIRED:           'retired',
+  DISPOSED:          'disposed',
 });
 
 const REQUEST_STATUS = Object.freeze({
@@ -44,7 +46,8 @@ const ALLOCATION_STATUS = Object.freeze({
 });
 
 const BOOKING_STATUS = Object.freeze({
-  ACTIVE:    'active',
+  UPCOMING:  'upcoming',
+  ONGOING:   'ongoing',
   COMPLETED: 'completed',
   CANCELLED: 'cancelled',
 });
@@ -64,12 +67,18 @@ const ACTIONS = Object.freeze({
   EMPLOYEE_UPDATED:      'EMPLOYEE_UPDATED',
   EMPLOYEE_ROLE_CHANGED: 'EMPLOYEE_ROLE_CHANGED',
   EMPLOYEE_DEACTIVATED:  'EMPLOYEE_DEACTIVATED',
+
+  // Bookings
+  BOOKING_CREATED:       'BOOKING_CREATED',
+  BOOKING_CANCELLED:     'BOOKING_CANCELLED',
+  BOOKING_RESCHEDULED:   'BOOKING_RESCHEDULED',
 });
 
 const ENTITIES = Object.freeze({
   DEPARTMENT: 'department',
   CATEGORY:   'category',
   EMPLOYEE:   'employee',
+  BOOKING:    'booking',
 });
 
 const NOTIFICATION_TYPES = Object.freeze({
@@ -77,6 +86,8 @@ const NOTIFICATION_TYPES = Object.freeze({
   CATEGORY_DEACTIVATED:   'CATEGORY_DEACTIVATED',
   ROLE_CHANGED:           'ROLE_CHANGED',
   EMPLOYEE_DEACTIVATED:   'EMPLOYEE_DEACTIVATED',
+  BOOKING_CONFIRMED:      'booking_confirmed',
+  BOOKING_CANCELLED:      'booking_cancelled',
 });
 
 module.exports = {

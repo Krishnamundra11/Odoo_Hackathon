@@ -148,7 +148,9 @@ const createBooking = async (userId, { asset_id, start_time, end_time, purpose }
 // RBAC: employees see only their own; admins/asset_managers see all.
 // ─────────────────────────────────────────────────────────────────────────────
 const getBookings = async (userId, userRole, { assetId, from, to, page, limit }) => {
-  const offset = (page - 1) * limit;
+  const safePage  = Math.max(1, parseInt(page, 10) || 1);
+  const safeLimit = Math.min(100, Math.max(1, parseInt(limit, 10) || 20));
+  const offset = (safePage - 1) * safeLimit;
 
   // Build dynamic WHERE
   const conditions = [];
@@ -213,15 +215,15 @@ const getBookings = async (userId, userRole, { assetId, from, to, page, limit })
 
   const [countResult, dataResult] = await Promise.all([
     pool.query(countQuery, params),
-    pool.query(dataQuery, [...params, limit, offset]),
+    pool.query(dataQuery, [...params, safeLimit, offset]),
   ]);
 
   const total      = countResult.rows[0]?.total ?? 0;
-  const totalPages = total > 0 ? Math.ceil(total / limit) : 0;
+  const totalPages = total > 0 ? Math.ceil(total / safeLimit) : 0;
 
   return {
     bookings: dataResult.rows,
-    pagination: { total, page, limit, totalPages },
+    pagination: { total, page: safePage, limit: safeLimit, totalPages },
   };
 };
 

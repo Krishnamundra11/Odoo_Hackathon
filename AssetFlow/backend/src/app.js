@@ -49,6 +49,7 @@ const authRoutes  = require('./features/auth/auth.routes');
 const dashboardRoutes = require('./features/dashboard/dashboard.routes');
 const activityLogRoutes = require('./features/activityLogs/activityLogs.routes');
 const notificationRoutes = require('./features/notifications/notifications.routes');
+const bookingRoutes = require('./features/bookings/booking.routes');
 const assetsRoutes = require('./features/assets/assets.routes');
 const orgRoutes    = require('./features/org/org.routes');
 
@@ -58,6 +59,7 @@ app.use('/api/activity-logs', activityLogRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/assets', assetsRoutes);
 app.use('/api/org',   orgRoutes);
+app.use('/api/bookings', bookingRoutes);
 
 app.get('/api/health', (req, res) => {
   res.status(200).json({ success: true, message: 'AssetFlow API is running' });
