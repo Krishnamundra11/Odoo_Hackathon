@@ -3,6 +3,7 @@ import { Search, Bell, Sun, ChevronDown, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../features/auth/hooks/useAuth';
 import apiClient from '../../services/apiClient';
+import { getInitials } from '../../lib/utils';
 
 export default function Topbar() {
   const { user, logout } = useAuth();
@@ -10,7 +11,7 @@ export default function Topbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuTimer, setMenuTimer] = useState(null);
   const [unreadCount, setUnreadCount] = useState(0);
-  const initials = (user?.name || '?').split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase();
+  const initials = getInitials(user?.name);
 
   const openMenu = () => {
     setMenuOpen(true);

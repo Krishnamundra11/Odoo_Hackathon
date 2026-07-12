@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { LoadingState, ErrorState, EmptyState } from '../../components/ui/StatusBadge';
 import * as allocationsApi from '../../features/allocations/api/allocationsApi';
 
 export default function AllocationScreen() {
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const assetId = searchParams.get('assetId');
 
@@ -114,7 +115,15 @@ export default function AllocationScreen() {
   if (error) return <ErrorState message={error} onRetry={() => setSearchParams({ assetId })} />;
 
   return (
-    <div className="space-y-6 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm md:p-8">
+    <div className="space-y-4">
+      <button
+        type="button"
+        onClick={() => (assetId ? setSearchParams({}) : navigate(-1))}
+        className="text-sm font-medium text-[#1D546D] hover:underline"
+      >
+        Back
+      </button>
+
       <h1 className="text-xl font-bold text-[#061E29]">
         {allocation?.assetTag} — {allocation?.assetName}
       </h1>

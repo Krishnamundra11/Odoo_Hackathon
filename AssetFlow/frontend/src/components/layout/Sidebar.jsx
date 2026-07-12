@@ -4,10 +4,11 @@ import {
   Wrench, ClipboardCheck, BarChart3, Bell, ChevronsLeft, ChevronsRight,
 } from 'lucide-react';
 import { useAuth } from '../../features/auth/hooks/useAuth';
+import { getInitials } from '../../lib/utils';
 
 const NAV_ITEMS = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['admin', 'asset_manager', 'department_head', 'employee'] },
-  { to: '/organization-setup', label: 'Organization Setup', icon: Building2, roles: ['admin'] },
+  { to: '/organization-setup', label: 'Organization Setup', icon: Building2, roles: ['admin', 'asset_manager', 'department_head', 'employee'] },
   { to: '/assets', label: 'Assets', icon: Boxes, roles: ['admin', 'asset_manager', 'department_head', 'employee'] },
   { to: '/allocations', label: 'Allocation & Transfer', icon: ArrowLeftRight, roles: ['admin', 'asset_manager', 'department_head'] },
   { to: '/bookings', label: 'Resource Booking', icon: CalendarClock, roles: ['admin', 'asset_manager', 'department_head', 'employee'] },
@@ -21,7 +22,7 @@ export default function Sidebar({ collapsed, onToggle }) {
   const { user } = useAuth();
   const role = user?.role || 'employee';
   const visibleItems = NAV_ITEMS.filter((item) => item.roles.includes(role));
-  const initials = (user?.name || '?').split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase();
+  const initials = getInitials(user?.name);
 
   return (
     <aside
