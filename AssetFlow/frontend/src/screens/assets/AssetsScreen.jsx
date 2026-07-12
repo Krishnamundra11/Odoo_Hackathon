@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronDown, Loader2, Plus, Search, X } from 'lucide-react';
 import { createAsset, getAssetMetadata, getAssets } from '../../features/assets/api/assetsApi';
 
@@ -53,6 +54,7 @@ function AssetStatusBadge({ status }) {
 }
 
 export default function AssetsScreen() {
+  const navigate = useNavigate();
   const [assets, setAssets] = useState([]);
   const [pagination, setPagination] = useState({ page: 1, limit: PAGE_SIZE, total: 0, totalPages: 0 });
   const [metadata, setMetadata] = useState({ categories: [], departments: [] });
@@ -205,6 +207,14 @@ export default function AssetsScreen() {
 
   return (
     <div className="space-y-6 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm md:p-8">
+      <button
+        type="button"
+        onClick={() => navigate(-1)}
+        className="text-sm font-medium text-[#1D546D] hover:underline"
+      >
+        Back
+      </button>
+
       <div>
         <h1 className="text-3xl font-bold text-[#061E29]">Assets</h1>
         <p className="mt-1 text-sm text-slate-500">Browse, search and manage every registered asset.</p>
