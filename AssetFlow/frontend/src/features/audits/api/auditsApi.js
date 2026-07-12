@@ -1,54 +1,60 @@
 import apiClient from '../../../services/apiClient';
 
+const unwrap = (res) => res?.data?.data ?? res?.data;
+
 export const getActiveAuditCycle = async () => {
-  try {
-    const res = await apiClient.get('/audits/active');
-    const cycle = res.data?.data || res.data || null;
-    if (!cycle || !cycle.id) {
-      return { data: null };
-    }
+  const cycle = unwrap(await apiClient.get('/audits/active'));
+  if (!cycle || !cycle.id) return null;
 
-    // Format auditors and items for UI
-    const startDate = cycle.start_date ? new Date(cycle.start_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '';
-    const endDate = cycle.end_date ? new Date(cycle.end_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '';
+  const startDate = cycle.start_date
+    ? new Date(cycle.start_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+    : '';
+  const endDate = cycle.end_date
+    ? new Date(cycle.end_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+    : '';
 
-    return {
-      data: {
-        id: cycle.id,
-        name: cycle.name || 'Audit Cycle',
-        scope: cycle.scope_department_name || cycle.scope_location || 'Organization-wide',
-        dateRange: `${startDate} — ${endDate}`,
-        auditors: cycle.auditor_names || cycle.auditors || [],
-        status: cycle.status,
-        items: (cycle.items || []).map((item) => ({
-          itemId: item.id,
-          assetId: item.asset_id || item.assetId,
-          assetTag: item.asset_tag || item.assetTag || '',
-          assetName: item.asset_name || item.assetName || '',
-          expectedLocation: item.expected_location || item.location || 'Assigned Location',
-          verification: item.result || item.verification || 'pending',
-        })),
-      },
-    };
-  } catch (error) {
-    throw new Error(error?.response?.data?.error?.message || error?.message || 'Could not load active audit cycle.');
-  }
+  return {
+    id:         cycle.id,
+    name:       cycle.name || 'Audit Cycle',
+    scope:      cycle.scope_department_name || cycle.scope_location || 'Organization-wide',
+    dateRange:  `${startDate} — ${endDate}`,
+    status:     cycle.status,
+    auditors:   cycle.auditor_names || [],
+    items: (cycle.items || []).map((item) => ({
+      itemId:           item.id,
+      assetId:          item.asset_id,
+      assetTag:         item.asset_tag  || '',
+      assetName:        item.asset_name || '',
+      assetStatus:      item.asset_status || '',
+      expectedLocation: item.expected_location || 'Assigned Location',
+      result:           item.result || 'pending',
+      notes:            item.notes || '',
+      auditedBy:        item.audited_by_name || '',
+      auditedAt:        item.audited_at || null,
+    })),
+  };
 };
 
-export const verifyAuditItem = async (auditId, assetId, verification) => {
-  try {
-    const res = await apiClient.patch(`/audits/${auditId}/items/${assetId}`, { verification });
-    return { data: res.data?.data || res.data };
-  } catch (error) {
-    throw new Error(error?.response?.data?.error?.message || error?.message || 'Could not update verification status.');
-  }
+// GET /api/audits/cycles/:id/discrepancy-report
+export const getDiscrepancyReport = async (cycleId) => {
+  const data = unwrap(await apiClient.get(`/audits/cycles/${cycleId}/discrepancy-report`));
+  return data; // { cycle, discrepancies[] }
 };
 
+// PATCH /api/audits/:auditId/items/:assetId  — mark result (verified/missing/damaged/pending)
+export const markAuditItem = async (auditId, assetId, result, notes = '') => {
+  const data = unwrap(await apiClient.patch(`/audits/${auditId}/items/${assetId}`, { verification: result, result, notes }));
+  return data;
+};
+
+// POST /api/audits/:id/close
 export const closeAuditCycle = async (auditId) => {
-  try {
-    const res = await apiClient.post(`/audits/${auditId}/close`);
-    return { data: res.data?.data || res.data };
-  } catch (error) {
-    throw new Error(error?.response?.data?.error?.message || error?.message || 'Could not close the audit cycle.');
-  }
+  const data = unwrap(await apiClient.post(`/audits/${auditId}/close`));
+  return data;
+};
+
+// POST /api/audits/cycles — create a new cycle (Asset Manager only)
+export const createAuditCycle = async (payload) => {
+  const data = unwrap(await apiClient.post('/audits/cycles', payload));
+  return data;
 };

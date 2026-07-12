@@ -55,6 +55,7 @@ const allocationRoutes = require('./features/allocation/allocation.routes');
 const transferRoutes = require('./features/allocation/transfer.routes');
 const maintenanceRoutes = require('./features/maintenance/maintenance.routes');
 const auditRoutes = require('./features/audit/audit.routes');
+const reportsRoutes = require('./features/reports/reports.routes');
 const orgRoutes    = require('./features/org/org.routes');
 
 
@@ -66,6 +67,7 @@ app.use('/api/assets', assetsRoutes);
 
 app.use('/api/audits', auditRoutes);
 app.use('/api/v1/audit-cycles', auditRoutes);
+app.use('/api/reports', reportsRoutes);
 app.use('/api/org',   orgRoutes);
 app.use('/api/allocations', allocationRoutes);
 app.use('/api/transfer-requests', transferRoutes);

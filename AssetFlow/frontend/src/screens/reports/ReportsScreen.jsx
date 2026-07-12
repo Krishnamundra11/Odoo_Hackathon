@@ -14,7 +14,7 @@ export default function ReportsScreen() {
     setError('');
     reportsApi
       .getReportsSummary()
-      .then((res) => setData(res.data))
+      .then((res) => setData(res))
       .catch((err) => setError(err.message || 'Could not load report data.'))
       .finally(() => setLoading(false));
   };

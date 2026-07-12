@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Calendar, Clock, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { LoadingState, ErrorState } from '../../components/ui/StatusBadge';
 import * as bookingsApi from '../../features/bookings/api/bookingsApi';
@@ -39,6 +40,15 @@ export default function ResourceBookingScreen() {
   const [showForm, setShowForm] = useState(false);
   const [slot, setSlot] = useState({ start: '', end: '' });
   const [submitting, setSubmitting] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get('action') === 'new') {
+      setShowForm(true);
+      searchParams.delete('action');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   useEffect(() => {
     bookingsApi
