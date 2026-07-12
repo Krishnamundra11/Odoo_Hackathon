@@ -1,156 +1,157 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock, User, Loader2, UserPlus } from 'lucide-react';
-import { register } from '../../features/auth/api/authApi';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Mail, Lock, User, Eye, EyeOff, ArrowRight, Boxes } from 'lucide-react';
+import { useAuth } from '../../features/auth/hooks/useAuth';
 
-const RegisterScreen = () => {
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: ''
-  });
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+export default function RegisterScreen() {
+  const { signup } = useAuth();
   const navigate = useNavigate();
+  const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '' });
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  const onSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
     setError('');
+    if (form.password !== form.confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+    setSubmitting(true);
     try {
-      await register(formData);
-      navigate('/login');
+      // role is intentionally never sent - backend hardcodes "employee" on signup
+      await signup({ name: form.name, email: form.email, password: form.password });
+      navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+      setError(err.message || 'Could not create your account. Please try again.');
     } finally {
-      setIsLoading(false);
+      setSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-200 flex items-center justify-center p-4">
-      <div className="w-full max-w-md transform transition-all duration-300 hover:scale-[1.01]">
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] overflow-hidden border border-white/60">
-          <div className="p-8 sm:p-10">
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-100 text-blue-600 mb-6 shadow-inner">
-                <UserPlus className="w-8 h-8" />
-              </div>
-              <h1 className="text-3xl font-bold text-slate-900 mb-2 tracking-tight">Create Account</h1>
-              <p className="text-slate-500">Join AssetFlow to manage your resources</p>
-            </div>
-
-            {error && (
-              <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-xl text-sm border border-red-100 flex items-center">
-                {error}
-              </div>
-            )}
-
-            <form onSubmit={onSubmit} className="space-y-5">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">First Name</label>
-                  <div className="relative group">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors">
-                      <User className="h-5 w-5" />
-                    </div>
-                    <input
-                      type="text"
-                      name="firstName"
-                      required
-                      value={formData.firstName}
-                      onChange={handleChange}
-                      className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
-                      placeholder="John"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">Last Name</label>
-                  <div className="relative group">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors">
-                      <User className="h-5 w-5" />
-                    </div>
-                    <input
-                      type="text"
-                      name="lastName"
-                      required
-                      value={formData.lastName}
-                      onChange={handleChange}
-                      className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
-                      placeholder="Doe"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Email Address</label>
-                <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors">
-                    <Mail className="h-5 w-5" />
-                  </div>
-                  <input
-                    type="email"
-                    name="email"
-                    required
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
-                    placeholder="you@company.com"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Password</label>
-                <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors">
-                    <Lock className="h-5 w-5" />
-                  </div>
-                  <input
-                    type="password"
-                    name="password"
-                    required
-                    value={formData.password}
-                    onChange={handleChange}
-                    className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
-                    placeholder="••••••••"
-                    minLength="6"
-                  />
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full flex justify-center items-center py-3.5 px-4 border border-transparent rounded-xl shadow-[0_4px_14px_0_rgba(59,130,246,0.39)] text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 hover:shadow-[0_6px_20px_rgba(59,130,246,0.23)] hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-200 mt-2"
-              >
-                {isLoading ? <Loader2 className="animate-spin h-5 w-5" /> : (
-                  <>
-                    <UserPlus className="mr-2 h-5 w-5" />
-                    Create Account
-                  </>
-                )}
-              </button>
-            </form>
-          </div>
-          
-          <div className="px-8 py-6 bg-slate-50/80 border-t border-slate-100 text-center backdrop-blur-md">
-            <p className="text-sm text-slate-600">
-              Already have an account?{' '}
-              <Link to="/login" className="font-semibold text-blue-600 hover:text-blue-700 transition-colors">
-                Sign in
-              </Link>
-            </p>
-          </div>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-[#F3F4F4] px-4 py-12">
+      <div className="mb-8 flex flex-col items-center text-center">
+        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#061E29]">
+          <Boxes className="h-6 w-6 text-white" />
         </div>
+        <h1 className="text-xl font-semibold text-[#061E29]">Create your AssetFlow account</h1>
+        <p className="mt-1 text-sm text-[#5F9598]">New accounts start as Employees.</p>
+      </div>
+
+      <div className="w-full max-w-sm rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+        {error && (
+          <div className="mb-4 rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-600">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="mb-1 block text-sm font-medium text-[#061E29]">Full name</label>
+            <div className="relative">
+              <User className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                name="name"
+                required
+                placeholder="Jane Doe"
+                value={form.name}
+                onChange={handleChange}
+                className="w-full rounded-lg border border-gray-300 py-2.5 pl-10 pr-3 text-sm text-[#061E29] placeholder:text-gray-400 focus:border-[#1D546D] focus:outline-none focus:ring-1 focus:ring-[#1D546D]"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-1 block text-sm font-medium text-[#061E29]">Work email</label>
+            <div className="relative">
+              <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <input
+                type="email"
+                name="email"
+                required
+                placeholder="you@company.com"
+                value={form.email}
+                onChange={handleChange}
+                className="w-full rounded-lg border border-gray-300 py-2.5 pl-10 pr-3 text-sm text-[#061E29] placeholder:text-gray-400 focus:border-[#1D546D] focus:outline-none focus:ring-1 focus:ring-[#1D546D]"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-1 block text-sm font-medium text-[#061E29]">Password</label>
+            <div className="relative">
+              <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                required
+                minLength={6}
+                placeholder="Enter your password"
+                value={form.password}
+                onChange={handleChange}
+                className="w-full rounded-lg border border-gray-300 py-2.5 pl-10 pr-10 text-sm text-[#061E29] placeholder:text-gray-400 focus:border-[#1D546D] focus:outline-none focus:ring-1 focus:ring-[#1D546D]"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-1 block text-sm font-medium text-[#061E29]">Confirm password</label>
+            <div className="relative">
+              <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="confirmPassword"
+                required
+                minLength={6}
+                placeholder="Re-enter your password"
+                value={form.confirmPassword}
+                onChange={handleChange}
+                className="w-full rounded-lg border border-gray-300 py-2.5 pl-10 pr-3 text-sm text-[#061E29] placeholder:text-gray-400 focus:border-[#1D546D] focus:outline-none focus:ring-1 focus:ring-[#1D546D]"
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={submitting}
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#061E29] py-2.5 text-sm font-medium text-white transition hover:bg-[#1D546D] disabled:opacity-50"
+          >
+            {submitting ? 'Creating account...' : (
+              <>
+                Create account <ArrowRight className="h-4 w-4" />
+              </>
+            )}
+          </button>
+        </form>
+      </div>
+
+      <p className="mt-6 text-sm text-[#1D546D]">
+        Already have an account?{' '}
+        <Link to="/login" className="font-semibold hover:underline">
+          Sign in
+        </Link>
+      </p>
+
+      <div className="mt-10 flex gap-4 text-xs text-gray-400">
+        <span>Privacy</span>
+        <span>·</span>
+        <span>Terms</span>
+        <span>·</span>
+        <span>Support</span>
       </div>
     </div>
   );
-};
-
-export default RegisterScreen;
+}

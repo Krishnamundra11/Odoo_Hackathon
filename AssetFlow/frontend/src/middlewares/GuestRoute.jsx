@@ -15,3 +15,5 @@ export const GuestRoute = () => {
 
   return user ? <Navigate to="/dashboard" replace /> : <Outlet />;
 };
+
+export default GuestRoute;
